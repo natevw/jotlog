@@ -14,7 +14,7 @@ func abortOnError(err error) {
 }
 
 func main() {
-  req, err := http.NewRequest("GET", "http://ipcalf.com/", nil)
+  req, err := http.NewRequest("GET", "http://localhost:5984/", nil)
   abortOnError(err)
   req.Header.Add("Accept", "application/json")
   
@@ -24,8 +24,14 @@ func main() {
   
   body, err := ioutil.ReadAll(resp.Body)
   abortOnError(err)
+  fmt.Printf("%s\n", body)
   
-  var s string
-  err = json.Unmarshal(body, &s)
-  fmt.Printf("%s\n", s)
+  type info struct {
+      Version string `json:"version"`
+      UUID string `json:"uuid"`
+      Vendor map[string]interface{} `json:"vendor"`
+  }
+  var i info
+  err = json.Unmarshal(body, &i)
+  fmt.Printf("%s\n", i.Vendor["version"])
 }
