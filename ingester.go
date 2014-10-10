@@ -33,5 +33,6 @@ func main() {
   }
   var i info
   err = json.Unmarshal(body, &i)
+  abortOnError(err)
   fmt.Printf("%s\n", i.Vendor["version"])
 }
