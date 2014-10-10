@@ -4,6 +4,7 @@ import "os"
 import "fmt"
 import "net/http"
 import "io/ioutil"
+import "encoding/json"
 
 func abortOnError(err error) {
   if err != nil {
@@ -15,7 +16,7 @@ func abortOnError(err error) {
 func main() {
   req, err := http.NewRequest("GET", "http://ipcalf.com/", nil)
   abortOnError(err)
-  req.Header.Add("Accept", "text/plain")
+  req.Header.Add("Accept", "application/json")
   
   resp, err := http.DefaultClient.Do(req)
   abortOnError(err)
@@ -23,5 +24,8 @@ func main() {
   
   body, err := ioutil.ReadAll(resp.Body)
   abortOnError(err)
-  fmt.Printf("%s\n", body)
+  
+  var s string
+  err = json.Unmarshal(body, &s)
+  fmt.Printf("%s\n", s)
 }
