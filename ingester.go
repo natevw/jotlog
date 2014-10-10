@@ -13,10 +13,13 @@ func abortOnError(err error) {
 }
 
 func main() {
-  resp, err := http.Get("http://ipcalf.com/")
+  req, err := http.NewRequest("GET", "http://ipcalf.com/", nil)
+  abortOnError(err)
+  req.Header.Add("Accept", "text/plain")
+  
+  resp, err := http.DefaultClient.Do(req)
   abortOnError(err)
   defer resp.Body.Close()
-  
   
   body, err := ioutil.ReadAll(resp.Body)
   abortOnError(err)
