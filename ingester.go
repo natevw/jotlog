@@ -1,7 +1,9 @@
 package main
 
+import "io"
 import "os"
 import "fmt"
+import "log"
 import "net/http"
 import "io/ioutil"
 import "encoding/json"
@@ -11,6 +13,15 @@ func abortOnError(err error) {
     fmt.Fprintf(os.Stderr, "%s\n", err) 
     os.Exit(-1)
   }
+}
+
+
+// via https://groups.google.com/d/msg/golang-nuts/s7Xk1q0LSU0/vSvGnerlDZ4J
+func Log(handler http.Handler) http.Handler {
+  return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+    log.Printf("%s %s %s", r.RemoteAddr, r.Method, r.URL)
+    handler.ServeHTTP(w, r)
+  })
 }
 
 func main() {
@@ -35,4 +46,11 @@ func main() {
   err = json.Unmarshal(body, &i)
   abortOnError(err)
   fmt.Printf("%s\n", i.Vendor["version"])
+  
+  
+  http.HandleFunc("/", func (w http.ResponseWriter, req *http.Request) {
+    io.WriteString(w, "hello, world!\n")
+  })
+	err = http.ListenAndServe(":8080", Log(http.DefaultServeMux))
+  abortOnError(err)
 }
