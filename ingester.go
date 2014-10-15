@@ -1,6 +1,6 @@
 package main
 
-import "io"
+//import "io"
 import "os"
 import "fmt"
 import "log"
@@ -49,7 +49,19 @@ func main() {
   
   
   http.HandleFunc("/", func (w http.ResponseWriter, req *http.Request) {
-    io.WriteString(w, "hello, world!\n")
+    err := req.ParseForm()
+    abortOnError(err)
+    
+    singleValForm := map[string]string{}
+    for key, values := range req.Form {
+        singleValForm[key] = values[0]
+    }
+    
+    s, err := json.Marshal(singleValForm)
+    abortOnError(err)
+    fmt.Printf("%s - %s\n%s\n\n", singleValForm["From"], singleValForm["Body"], s)
+    
+    fmt.Fprintf(w, "You said: %s\n", req.Form["Body"])
   })
 	err = http.ListenAndServe(":8080", Log(http.DefaultServeMux))
   abortOnError(err)
